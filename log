@@ -1,0 +1,28 @@
+#logistic Regression
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error,r2_score
+
+df=pd.read_csv("C:/Users/admin/Downloads/insurance_data.csv")
+df=df.dropna()
+#Scatter plt
+plt.scatter(df.age,df.bought_insurance,marker='+',color='red')
+#plt.plot(df.age,df.bought_insurance)
+plt.show()
+
+#split dataset
+X_train,X_test,y_train,y_test=train_test_split(df[['age']],df.bought_insurance,test_size=0.1)
+#create model
+model=LogisticRegression()
+#train model
+model.fit(X_train,y_train)
+#prediction
+print(model.predict(X_test))
+#model accuracy
+print(model.score(X_test,y_test))
+#probability
+print(model.predict_proba(X_test))
