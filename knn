@@ -1,0 +1,93 @@
+# Import necessary libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import sklearn.metrics
+
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+
+# Read dataset
+df = pd.read_csv("C:/Users/admin/Downloads/Iris.csv")
+
+print(df.head())
+
+# Separate input and output
+X = df.drop(["Id", "Species"], axis=1)
+y = df["Species"]
+
+# Minimum and maximum values
+print(X["SepalLengthCm"].min())
+print(X["SepalLengthCm"].max())
+
+print(X["PetalLengthCm"].min())
+print(X["PetalLengthCm"].max())
+
+print(X["PetalWidthCm"].min())
+print(X["PetalWidthCm"].max())
+
+# Scaling
+scaler = MinMaxScaler()
+X_scaled = scaler.fit_transform(X)
+
+print(X_scaled)
+
+# Split dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X_scaled, y, test_size=0.5, random_state=42
+)
+
+# KNN classifier
+knn = KNeighborsClassifier()
+knn.fit(X_train, y_train)
+
+# Prediction
+y_pred = knn.predict(X_test)
+print(y_pred)
+
+# Evaluation metrics
+lbs = ['Iris-versicolor', 'Iris-setosa', 'Iris-virginica']
+
+print("Confusion Matrix:")
+print(sklearn.metrics.confusion_matrix(y_test, y_pred, labels=lbs))
+
+print("Accuracy:")
+print(sklearn.metrics.accuracy_score(y_test, y_pred))
+
+print("Precision:")
+print(sklearn.metrics.precision_score(
+    y_test, y_pred, labels=lbs, average='macro'
+))
+
+print("Recall:")
+print(sklearn.metrics.recall_score(
+    y_test, y_pred, labels=lbs, average='macro'
+))
+
+print("F1 Score:")
+print(sklearn.metrics.f1_score(
+    y_test, y_pred, labels=lbs, average='macro'
+))
+
+# Accuracy for different K values
+score = []
+
+for i in range(1, 151):
+    knn = KNeighborsClassifier(
+        n_neighbors=i, metric='minkowski', p=2
+    )
+
+    knn.fit(X_scaled, y)
+    y_pred = knn.predict(X_scaled)
+
+    score.append(
+        sklearn.metrics.accuracy_score(y, y_pred)
+    )
+
+# Plot graph
+plt.plot(range(1, 151), score)
+plt.xlabel("K Value")
+plt.ylabel("Accuracy")
+plt.title("KNN Accuracy")
+plt.show()
