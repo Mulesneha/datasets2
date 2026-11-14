@@ -1,0 +1,44 @@
+#naive bayes
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.datasets import load_diabetes
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn import metrics
+
+diabetes=load_diabetes()
+
+data=pd.DataFrame(diabetes.data,columns=diabetes.feature_names)
+data['Target']=diabetes.target
+#convert target into binary class
+median_val=np.median(data['Target'])
+data['Target']=(data['Target']>median_val).astype(int)
+
+X=data.drop(columns='Target')
+y=data['Target']
+
+X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.3,random_state=42)
+
+gb=GaussianNB()
+
+gb.fit(X_train,y_train)
+
+y_pred=gb.predict(X_test)
+#Accuracy
+accuracy=metrics.accuracy_score(y_test,y_pred)
+print("Accuracy:",accuracy)
+print("Accuracy Percentage: {:.2f}%".format(accuracy * 100))
+
+
+#display cm
+cm=metrics.confusion_matrix(y_test,y_pred)
+plt.figure(figsize=(6,5))
+sns.heatmap(cm, annot=True, fmt="g", cmap="magma")
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.title("Confusion matrix")
+plt.show()
